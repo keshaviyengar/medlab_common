@@ -1,6 +1,8 @@
 #pragma once
 
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
+//#include <Eigen/Dense>
+#include "robotics_math.h"
 #include <medlab_common/robotics_math.h>
 #include <medlab_common/medlab_types.h>
 #include <memory>
