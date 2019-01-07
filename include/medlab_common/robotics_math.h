@@ -7,11 +7,60 @@
 
 namespace RoboticsMath 
 {
-  // typedef Eigen::Matrix<double, 4, 4> Matrix4d;
-  typedef Eigen::Matrix<double, 6, 6> Matrix6d;
-  typedef Eigen::Matrix<double, 6, 1> Vector6d;
-  typedef Eigen::Matrix<double, 7, 1> Vector7d;
-  typedef Eigen::Matrix<double, 8, 1> Vector8d;
+  // define custom data types
+  using Matrix6d = Eigen::Matrix<double, 6, 6>;
+  using Vector6d = Eigen::Matrix<double, 6, 1>;
+  using Vector7d = Eigen::Matrix<double, 7, 1>;
+  using Vector8d = Eigen::Matrix<double, 8, 1>;
+
+//  typedef Eigen::Matrix<double, 6, 6> Matrix6d;
+//  typedef Eigen::Matrix<double, 6, 1> Vector6d;
+//  typedef Eigen::Matrix<double, 7, 1> Vector7d;
+//  typedef Eigen::Matrix<double, 8, 1> Vector8d;
+
+  template <typename Derived1, typename Derived2>
+  void SetRotation(Eigen::DenseBase<Derived1>& g, Eigen::DenseBase<Derived2>& R)
+  {
+      assert(g.rows() == 4);
+      assert(g.cols() == 4);
+      assert(R.rows() == 3);
+      assert(R.cols() == 3);
+      g.block(0,0,3,3) = R;
+  }
+
+  template <typename Derived>
+  Eigen::MatrixXd GetRotation(Eigen::DenseBase<Derived> const& in)
+  {
+      Eigen::MatrixXd R = in.block(0,0,3,3);
+      return R;
+  }
+
+  template <typename Derived>
+  Eigen::MatrixXd GetTranslation(Eigen::DenseBase<Derived> const& in)
+  {
+      Eigen::MatrixXd p = in.block(0,3,3,1);
+      return p;
+  }
+
+  template <typename Derived1, typename Derived2>
+  void SetTranslation(Eigen::DenseBase<Derived1>& g, Eigen::DenseBase<Derived2>& p)
+  {
+      assert(g.rows() == 4);
+      assert(g.cols() == 4);
+      assert(p.rows() == 3);
+      assert(p.cols() == 1);
+      g.block(0,3,3,1) = p;
+  }
+
+  template <typename Derived>
+  Eigen::MatrixXd Inverse(Eigen::DenseBase<Derived> const& g)
+  {
+      Eigen::MatrixXd ginv = Eigen::MatrixXd::Zero(4,4);
+      ginv.block(0,0,3,3) = g.block(0,0,3,3).transpose(); //R^T
+      ginv.block(0,3,3,1) = -g.block(0,0,3,3).transpose()*g.block(0,3,3,1); //-R^T*p
+      ginv(3,3) = 1.0;
+      return ginv;
+  }
 
   double deg2rad(double degrees);
   double sgn(double x);

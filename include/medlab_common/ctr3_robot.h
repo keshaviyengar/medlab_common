@@ -1,19 +1,10 @@
 #pragma once
 
 #include <eigen3/Eigen/Dense>
-//#include <Eigen/Dense>
-#include "robotics_math.h"
 #include <medlab_common/robotics_math.h>
 #include <medlab_common/medlab_types.h>
 #include <memory>
 #include <utility>
-
-//#include <Options.h>
-//#include <Utility.h>
-//#include <BasicFunctions.h>
-//#include <Tube.h>
-
-//using namespace CTR;
 
 class CTR3Robot
 {

@@ -16,14 +16,12 @@
 #include <BasicFunctions.h>
 #include <Tube.h>
 
-#include <ros/console.h>
-
-//using namespace CTR;
+//#include <ros/console.h>
 
 CTR3Robot::CTR3Robot(medlab::Cannula3 cannula):
   cannula_(cannula),
-  qHome_(RoboticsMath::Vector6d::Zero()),
   BaseFrame_WORLD(Eigen::Matrix4d::Identity()),
+  qHome_(RoboticsMath::Vector6d::Zero()),
   nInterp_(250)
 {
 }
