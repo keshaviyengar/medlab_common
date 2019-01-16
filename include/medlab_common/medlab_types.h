@@ -1,7 +1,8 @@
+// TODO: move all these definitions into CTR3Robot class?
+
 #pragma once
 
 #include <eigen3/Eigen/Dense>
-//#include <Eigen/Dense>
 #include <vector>
 #include <tuple>
 
@@ -17,7 +18,7 @@ namespace medlab
 using CurvFun  = CTR::Functions::constant_fun< Eigen::Vector2d >;
 using TubeType = CTR::Tube< CurvFun >;
 using Cannula3 = std::tuple<TubeType, TubeType, TubeType>; // CTR3Robot architecture
-using OType = CTR::DeclareOptions < CTR::Option::ComputeJacobian,
+using OType    = CTR::DeclareOptions < CTR::Option::ComputeJacobian,
                                     CTR::Option::ComputeGeometry,
                                     CTR::Option::ComputeStability,
                                     CTR::Option::ComputeCompliance >::options;
@@ -48,6 +49,10 @@ struct CTR3RobotParams {
   double k3;
   double OD3;
   double ID3;
+
+  // starting configuration
+  RoboticsMath::Vector6d qHome; // { psi_l_home [rad], beta_home [m] }
+  Eigen::Matrix4d baseFrame; // TODO: not used anywhere?
 };
 
 struct CTR3KinematicsInputVector { // format of the input vector fed into Kinematics_with_dense_output()
@@ -76,6 +81,4 @@ struct KinOut {
   RoboticsMath::Matrix6d Jhybrid;
   double Stability;
 };
-
-
 }

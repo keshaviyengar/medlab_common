@@ -18,10 +18,29 @@
 
 //#include <ros/console.h>
 
+medlab::Cannula3 CTR3Robot::createCannula3(medlab::CTR3RobotParams params)
+{
+  // Curvature of each tube
+  CTR::Functions::constant_fun< CTR::Vector<2>::type > k_fun1_r( (params.k1)*Eigen::Vector2d::UnitX() );
+  CTR::Functions::constant_fun< CTR::Vector<2>::type > k_fun2_r( (params.k2)*Eigen::Vector2d::UnitX() );
+  CTR::Functions::constant_fun< CTR::Vector<2>::type > k_fun3_r( (params.k3)*Eigen::Vector2d::UnitX() );
+
+  // Define tubes
+  medlab::TubeType T1_r = CTR::make_annular_tube( params.L1, params.Lt1, params.OD1, params.ID1, k_fun1_r, params.E, params.G );
+  medlab::TubeType T2_r = CTR::make_annular_tube( params.L2, params.Lt2, params.OD2, params.ID2, k_fun2_r, params.E, params.G );
+  medlab::TubeType T3_r = CTR::make_annular_tube( params.L3, params.Lt3, params.OD3, params.ID3, k_fun3_r, params.E, params.G );
+
+  // Assemble cannula
+  medlab::Cannula3 cannula = std::make_tuple( T1_r, T2_r, T3_r );
+
+  return cannula;
+}
+
 CTR3Robot::CTR3Robot(medlab::Cannula3 cannula):
+  WStability(RoboticsMath::Matrix6d::Identity()),
+//  BaseFrame_WORLD(Eigen::Matrix4d::Identity()),
   cannula_(cannula),
-  BaseFrame_WORLD(Eigen::Matrix4d::Identity()),
-  qHome_(RoboticsMath::Vector6d::Zero()),
+//  qHome_(RoboticsMath::Vector6d::Zero()),
   nInterp_(250)
 {
 }
@@ -30,41 +49,49 @@ CTR3Robot::~CTR3Robot()
 {
 }
 
-bool CTR3Robot::init(medlab::CTR3RobotParams params, RoboticsMath::Vector6d qHome, Eigen::Matrix4d baseFrame)
+bool CTR3Robot::init(medlab::CTR3RobotParams params)
 {
   currCannulaParams_ = params;
-  qHome_ = qHome;
-  BaseFrame_WORLD = baseFrame;
 
-  currKinematicsInputVector_.PsiL = qHome_.head(3);
-  currKinematicsInputVector_.Beta = qHome_.tail(3);
+  currKinematicsInputVector_.PsiL = GetQHome().head(3);
+  currKinematicsInputVector_.Beta = GetQHome().tail(3);
   currKinematicsInputVector_.Ftip = Eigen::Vector3d::Zero();
   currKinematicsInputVector_.Ttip = Eigen::Vector3d::Zero();
-  currQVec_ = qHome_;
-
-//  ROS_INFO_STREAM("starting kinematics");
+  currQVec_ = GetQHome();
 
   callKinematicsWithDenseOutput(currKinematicsInputVector_); // currInterpolatedBackbone_ set in here
 
   return true;
 }
 
+//bool CTR3Robot::init(medlab::CTR3RobotParams params, RoboticsMath::Vector6d qHome, Eigen::Matrix4d baseFrame)
+//{
+//  currCannulaParams_ = params;
+//  qHome_ = qHome;
+//  BaseFrame_WORLD = baseFrame;
+
+//  currKinematicsInputVector_.PsiL = qHome_.head(3);
+//  currKinematicsInputVector_.Beta = qHome_.tail(3);
+//  currKinematicsInputVector_.Ftip = Eigen::Vector3d::Zero();
+//  currKinematicsInputVector_.Ttip = Eigen::Vector3d::Zero();
+//  currQVec_ = qHome_;
+
+//  callKinematicsWithDenseOutput(currKinematicsInputVector_); // currInterpolatedBackbone_ set in here
+
+//  return true;
+//}
+
 RoboticsMath::Vector6d CTR3Robot::GetQRelative()
 {
-//  return currQVec_ - qHome_;
   RoboticsMath::Vector6d qRelative;
   qRelative.topRows(3) = currKinematics.Alpha;
-  qRelative.bottomRows(3) = currQVec_.bottomRows(3) - qHome_.bottomRows(3);
+  qRelative.bottomRows(3) = currQVec_.bottomRows(3) - GetQHome().bottomRows(3);
   return qRelative;
 }
 
 void CTR3Robot::callKinematicsWithDenseOutput(medlab::CTR3KinematicsInputVector newKinematicsInput)
 {
   CTR::KinRetDense< CTR::State< std::tuple_size<medlab::Cannula3>::type::value, medlab::OType >> ret1 = CTR::Kinematics_with_dense_output(cannula_, newKinematicsInput, medlab::OType());
-//  auto ret1 = CTR::Kinematics_with_dense_output(cannula_, newKinematicsInput, medlab::OType());
-//  typedef CTR::DeclareOptions < Option::ComputeJacobian, Option::ComputeGeometry, Option::ComputeStability, Option::ComputeCompliance >::options OType;
-//  KinRetDense<State<3,OType>> ret1 = CTR::Kinematics_with_dense_output(cannula_, newKinematicsInput, OType());
-
 
   RoboticsMath::Matrix6d Jbody;
   Jbody = CTR::GetTipJacobianForTube1(ret1.y_final);
@@ -123,8 +150,6 @@ void CTR3Robot::callKinematicsWithDenseOutput(medlab::CTR3KinematicsInputVector 
       xi = RoboticsMath::collapseTransform(gStari);
       poseData.col(i) = xi;
     }
-
-
 
 //  // Pick out arc length points
 //  int nPts_ = ret1.arc_length_points.size();
@@ -334,8 +359,10 @@ void CTR3Robot::interpolateBackbone(Eigen::VectorXd sRef, Eigen::MatrixXd poseDa
 
 void CTR3Robot::computeStabilityWeightingMatrix(double sThreshold, double alphaS)
 {
-  RoboticsMath::Matrix6d W = (exp(1.0 / (currKinematics.Stability - sThreshold)) - 1.0) * RoboticsMath::Matrix6d::Identity();
-//  RoboticsMath::Vector6d vS1 = RoboticsMath::Vector6d::Zero();
+  // computes WStability and vS
+
+  WStability = (exp(1.0 / (currKinematics.Stability - sThreshold)) - 1.0) * RoboticsMath::Matrix6d::Identity();
+
   RoboticsMath::Vector6d dSdq = RoboticsMath::Vector6d::Zero();
 
   double rotationalStep = 0.05*M_PI / 180.0;
@@ -392,6 +419,4 @@ void CTR3Robot::computeStabilityWeightingMatrix(double sThreshold, double alphaS
   }
 
   vS = alphaS*dSdq;
-
-  WStability = W;
 }

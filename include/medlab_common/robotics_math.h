@@ -13,11 +13,6 @@ namespace RoboticsMath
   using Vector7d = Eigen::Matrix<double, 7, 1>;
   using Vector8d = Eigen::Matrix<double, 8, 1>;
 
-//  typedef Eigen::Matrix<double, 6, 6> Matrix6d;
-//  typedef Eigen::Matrix<double, 6, 1> Vector6d;
-//  typedef Eigen::Matrix<double, 7, 1> Vector7d;
-//  typedef Eigen::Matrix<double, 8, 1> Vector8d;
-
   template <typename Derived1, typename Derived2>
   void SetRotation(Eigen::DenseBase<Derived1>& g, Eigen::DenseBase<Derived2>& R)
   {
