@@ -21,17 +21,17 @@
 medlab::Cannula3 CTR3Robot::createCannula3(medlab::CTR3RobotParams params)
 {
   // Curvature of each tube
-  CTR::Functions::constant_fun< CTR::Vector<2>::type > k_fun1_r( (params.k1)*Eigen::Vector2d::UnitX() );
-  CTR::Functions::constant_fun< CTR::Vector<2>::type > k_fun2_r( (params.k2)*Eigen::Vector2d::UnitX() );
-  CTR::Functions::constant_fun< CTR::Vector<2>::type > k_fun3_r( (params.k3)*Eigen::Vector2d::UnitX() );
+  CTR::Functions::constant_fun< CTR::Vector<2>::type > k_fun1( (params.k1)*Eigen::Vector2d::UnitX() );
+  CTR::Functions::constant_fun< CTR::Vector<2>::type > k_fun2( (params.k2)*Eigen::Vector2d::UnitX() );
+  CTR::Functions::constant_fun< CTR::Vector<2>::type > k_fun3( (params.k3)*Eigen::Vector2d::UnitX() );
 
   // Define tubes
-  medlab::TubeType T1_r = CTR::make_annular_tube( params.L1, params.Lt1, params.OD1, params.ID1, k_fun1_r, params.E, params.G );
-  medlab::TubeType T2_r = CTR::make_annular_tube( params.L2, params.Lt2, params.OD2, params.ID2, k_fun2_r, params.E, params.G );
-  medlab::TubeType T3_r = CTR::make_annular_tube( params.L3, params.Lt3, params.OD3, params.ID3, k_fun3_r, params.E, params.G );
+  medlab::TubeType T1 = CTR::make_annular_tube( params.L1, params.Lt1, params.OD1, params.ID1, k_fun1, params.E, params.G );
+  medlab::TubeType T2 = CTR::make_annular_tube( params.L2, params.Lt2, params.OD2, params.ID2, k_fun2, params.E, params.G );
+  medlab::TubeType T3 = CTR::make_annular_tube( params.L3, params.Lt3, params.OD3, params.ID3, k_fun3, params.E, params.G );
 
   // Assemble cannula
-  medlab::Cannula3 cannula = std::make_tuple( T1_r, T2_r, T3_r );
+  medlab::Cannula3 cannula = std::make_tuple( T1, T2, T3 );
 
   return cannula;
 }
@@ -53,11 +53,11 @@ bool CTR3Robot::init(medlab::CTR3RobotParams params)
 {
   currCannulaParams_ = params;
 
-  currKinematicsInputVector_.PsiL = GetQHome().head(3);
-  currKinematicsInputVector_.Beta = GetQHome().tail(3);
+  currKinematicsInputVector_.PsiL = params.qHome.head(3);
+  currKinematicsInputVector_.Beta = params.qHome.tail(3);
   currKinematicsInputVector_.Ftip = Eigen::Vector3d::Zero();
   currKinematicsInputVector_.Ttip = Eigen::Vector3d::Zero();
-  currQVec_ = GetQHome();
+  currQVec_ = params.qHome;
 
   callKinematicsWithDenseOutput(currKinematicsInputVector_); // currInterpolatedBackbone_ set in here
 

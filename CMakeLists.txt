@@ -11,7 +11,7 @@ find_package(Boost REQUIRED) # needed to build cannula_kinematics library
 
 # path to Cannula Kinematics library
 set(CannulaKinematics_DIR
-  /home/remireaa/Documents/LIBRARIES/CannulaKinematics
+  /home/remireaa/Documents/LIBRARIES/CannulaKinematics_shared
 )
 
 
