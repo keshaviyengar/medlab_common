@@ -85,7 +85,14 @@ RoboticsMath::Vector6d CTR3Robot::GetQRelative()
 {
   RoboticsMath::Vector6d qRelative;
   qRelative.topRows(3) = currKinematics.Alpha;
-  qRelative.bottomRows(3) = currQVec_.bottomRows(3) - GetQHome().bottomRows(3);
+//  qRelative.bottomRows(3) = currQVec_.bottomRows(3) - GetQHome().bottomRows(3);
+
+  qRelative[5] = currQVec_[5] - GetQHome()[5];
+  qRelative[4] = currQVec_[4] - GetQHome()[4] - qRelative[5];
+  qRelative[3] = currQVec_[3] - GetQHome()[3] - qRelative[5];
+//  std::cout << "QVec[4] = " << currQVec_[4] << ", QRelative[4] = " << qRelative[4] << std::endl;
+//  std::cout << "QVec = " << currQVec_.bottomRows(3).transpose() << std::endl;
+
   return qRelative;
 }
 
