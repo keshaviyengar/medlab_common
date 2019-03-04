@@ -83,6 +83,8 @@ bool CTR3Robot::init(medlab::CTR3RobotParams params)
 
 RoboticsMath::Vector6d CTR3Robot::GetQRelative()
 {
+  // !! NOTE: THIS IS ONLY VALID FOR THE ENDONASAL ROBOT DUE TO THE BULK TRANSLATION !!
+
   RoboticsMath::Vector6d qRelative;
   qRelative.topRows(3) = currKinematics.Alpha;
 //  qRelative.bottomRows(3) = currQVec_.bottomRows(3) - GetQHome().bottomRows(3);

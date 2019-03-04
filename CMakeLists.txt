@@ -1,27 +1,36 @@
 cmake_minimum_required(VERSION 3.0)
 project(medlab_common)
 
-#add_compile_options(-std=c++14)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(catkin REQUIRED COMPONENTS roscpp)
 find_package(Eigen3 REQUIRED NO_MODULE) # sets the ${EIGEN3_INCLUDE_DIR} cmake variable
-find_package(Boost REQUIRED) # needed to build cannula_kinematics library
 
 # path to Cannula Kinematics library
-set(CannulaKinematics_DIR
+set(KINEMATICS_DIR
   /home/remireaa/Documents/LIBRARIES/CannulaKinematics_shared
 )
 
+set(KINEMATICS_INCLUDE_DIRS
+  ${KINEMATICS_DIR}/include
+)
 
-if(NOT EXISTS "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
-  file(MAKE_DIRECTORY "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
-endif()
+find_library(
+  KINEMATICS_LIBRARIES
+  NAMES
+    cannula_kinematics
+  PATHS
+    ${KINEMATICS_DIR}/build
+)
+
+#if(NOT EXISTS "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
+#  file(MAKE_DIRECTORY "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}")
+#endif()
 
 set(${PROJECT_NAME}_INCLUDE_DIRECTORIES
     include
-    ${CannulaKinematics_DIR}/include
+    ${KINEMATICS_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
 )
 
@@ -57,7 +66,8 @@ include_directories(
 ## robotics_math library
 add_library(robotics_math src/robotics_math.cpp)
 
-## cannula_kinematic library
+## uncomment if building cannula_kinematics library
+#find_package(Boost REQUIRED)
 #add_library(cannula_kinematics
 #  ${CannulaKinematics_DIR}/src/DynamicMemoryBlock.cpp
 #  ${CannulaKinematics_DIR}/src/ReferenceCannulaKinematics.cpp
@@ -68,7 +78,7 @@ add_library(robotics_math src/robotics_math.cpp)
 ## ctr3_robot library
 #link_directories(${CannulaKinematics_DIR}/build)
 add_library(ctr3_robot src/ctr3_robot.cpp)
-target_link_libraries(ctr3_robot ${CannulaKinematics_DIR}/build/libcannula_kinematics.so) # link against cannula_kinematics
+target_link_libraries(ctr3_robot ${KINEMATICS_LIBRARIES}) # link against cannula_kinematics
 
 
 #############
