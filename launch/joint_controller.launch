@@ -1,0 +1,13 @@
+<launch>
+    <!-- Load the urdf into the parameter server. -->
+    <param name="my_robot_description" textfile="$(find medlab_common)/urdf/ctr3_robot.xml"/>
+
+    <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_pub">
+        <param name="use_gui" value="True" />
+        <remap from="robot_description" to="my_robot_description" />
+        <remap from="/joint_states" to="/ctm/joint_state" />
+    </node>
+
+    <node pkg="medlab_common" type="main" name="ctr3_kinematics"/>
+
+</launch>

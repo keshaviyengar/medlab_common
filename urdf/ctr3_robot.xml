@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<robot name="ctr3_robot">
+    <link name="base_link" />
+    <link name="link1" />
+    <link name="link2" />
+    <link name="link3" />
+
+    <joint name="joint1_rot" type="continuous">
+        <parent link="base_link"/>
+        <child link="link1"/>
+    </joint>
+
+    <joint name="joint2_rot" type="continuous">
+        <parent link="base_link"/>
+        <child link="link2"/>
+    </joint>
+
+    <joint name="joint3_rot" type="continuous">
+        <parent link="base_link"/>
+        <child link="link3"/>
+    </joint>
+
+    <joint name="joint1_ext" type="prismatic">
+        <parent link="base_link"/>
+        <child link="link1"/>
+        <limit effort="1000.0" lower="-0.2225" upper="0" velocity="0.001"/>
+    </joint>
+
+    <joint name="joint2_ext" type="prismatic">
+        <parent link="base_link"/>
+        <child link="link2"/>
+        <limit effort="1000.0" lower="-0.163" upper="0" velocity="0.001"/>
+    </joint>
+
+    <joint name="joint3_ext" type="prismatic">
+        <parent link="base_link"/>
+        <child link="link3"/>
+        <limit effort="1000.0" lower="-0.1044" upper="0" velocity="0.001"/>
+    </joint>
+</robot>

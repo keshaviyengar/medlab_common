@@ -7,9 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(catkin REQUIRED COMPONENTS roscpp)
 find_package(Eigen3 REQUIRED NO_MODULE) # sets the ${EIGEN3_INCLUDE_DIR} cmake variable
 
+
+
 # path to Cannula Kinematics library
 set(KINEMATICS_DIR
-  /home/remireaa/Documents/LIBRARIES/CannulaKinematics_shared
+  /home/keshav/catkin_ws/src/vanderbiltmedlab/CannulaKinematics
 )
 
 set(KINEMATICS_INCLUDE_DIRS
@@ -49,6 +51,7 @@ catkin_package(
   LIBRARIES
     robotics_math
     ctr3_robot
+    ctr3_robot_viz
   CATKIN_DEPENDS
     roscpp
 )
@@ -76,9 +79,16 @@ add_library(robotics_math src/robotics_math.cpp)
 #)
 
 ## ctr3_robot library
-#link_directories(${CannulaKinematics_DIR}/build)
+link_directories(${CannulaKinematics_DIR}/build)
+
 add_library(ctr3_robot src/ctr3_robot.cpp)
-target_link_libraries(ctr3_robot ${KINEMATICS_LIBRARIES}) # link against cannula_kinematics
+target_link_libraries(ctr3_robot robotics_math ${KINEMATICS_LIBRARIES}) # link against cannula_kinematics
+
+add_library(ctr3_robot_viz src/ctr3_robot_viz.cpp)
+target_link_libraries(ctr3_robot_viz ${KINEMATICS_LIBRARIES}) # link against cannula_kinematics
+
+add_executable(main src/main.cpp)
+target_link_libraries(main robotics_math ctr3_robot ctr3_robot_viz ${catkin_LIBRARIES} ${KINEMATICS_LIBRARIES})
 
 
 #############

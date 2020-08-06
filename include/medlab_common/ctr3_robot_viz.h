@@ -2,23 +2,21 @@
 #ifndef CTR3_ROBOT_VIZ__H
 #define CTR3_ROBOT_VIZ__H
 
-#include <QObject>
-#include <rqt_endonasal_teleop/ctr3_robot.h>
+#include <medlab_common/ctr3_robot.h>
 #include <ros/ros.h>
 
 
-Q_DECLARE_METATYPE(CTR3Robot)
+// Q_DECLARE_METATYPE(CTR3Robot*)
 
-class CTR3RobotViz : public QObject
+class CTR3RobotViz
 {
-  Q_OBJECT
+  //Q_OBJECT
 
 public:
   CTR3RobotViz();
   void init(std::string name_space); // advertises topic to rViz
 
-public slots:
-  void slot_updateViz(CTR3Robot& robot); // creates marker array and publishes to rViz
+  void updateViz(CTR3Robot& robot); // creates marker array and publishes to rViz
 
 private:
   ros::NodeHandle nh_;

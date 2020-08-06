@@ -1,7 +1,7 @@
-#include <rqt_endonasal_teleop/ctr3_robot_viz.h>
-#include <rqt_endonasal_teleop/ctr3_robot.h>
-#include <rqt_endonasal_teleop/medlab_types.h>
-#include <rqt_endonasal_teleop/robotics_math.h>
+#include <medlab_common/ctr3_robot_viz.h>
+#include <medlab_common/ctr3_robot.h>
+#include <medlab_common/medlab_types.h>
+#include <medlab_common/robotics_math.h>
 
 #include <Eigen/Dense>
 #include <visualization_msgs/Marker.h>
@@ -24,7 +24,7 @@ void CTR3RobotViz::init(std::string name_space)
 }
 
 
-void CTR3RobotViz::slot_updateViz(CTR3Robot &robot)
+void CTR3RobotViz::updateViz(CTR3Robot &robot)
 {
   // ensure we've initialized
   if(!init_flag_){
@@ -123,6 +123,12 @@ void CTR3RobotViz::slot_updateViz(CTR3Robot &robot)
       }
       else
       {
+          marker.color.r = 0.0f; // green
+          marker.color.g = 1.0f;
+          marker.color.b = 0.0f;
+
+          marker.scale.x = 1.168e-3; // width of inner tube
+          marker.scale.y = 1.168e-3;
           marker.scale.z = gap*2;
       }
 

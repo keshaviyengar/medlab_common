@@ -28,7 +28,7 @@ public:
   int GetNPts() {return nPts_;}
   int GetNInterp() {return nInterp_;}
 
-  void callKinematicsWithDenseOutput(medlab::CTR3KinematicsInputVector newKinematicsInput);
+  void callKinematicsWithDenseOutput(medlab::CTR3KinematicsInputVector newKinematicInput);
 //  medlab::KinOut callKinematicsWithDenseOutput(medlab::CTR3KinematicsInputVector newKinematicsInput);
 
 //  Eigen::MatrixXd transformToBaseFrame(CTR::KinRetDense< CTR::State< std::tuple_size<medlab::Cannula3>::type::value, medlab::OType >> kinret);
